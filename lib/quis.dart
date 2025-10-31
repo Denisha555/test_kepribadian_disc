@@ -1,3 +1,4 @@
+import 'package:aplikasi_tes_kepribadian/hasil.dart';
 import 'package:flutter/material.dart';
 import 'package:aplikasi_tes_kepribadian/disc.dart';
 
@@ -45,10 +46,9 @@ class _QuisState extends State<Quis> {
       });
     } else {
       // Tes selesai → pindah ke halaman hasil
-      Navigator.pushReplacementNamed(
+      Navigator.pushReplacement(
         context,
-        '/result',
-        arguments: scores, // Kirim skor ke halaman hasil
+        MaterialPageRoute(builder: (context) => Hasil(), settings: RouteSettings(arguments: scores)),
       );
     }
   }
