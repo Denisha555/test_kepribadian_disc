@@ -14,10 +14,10 @@ class Hasil extends StatelessWidget {
 
     // Warna untuk setiap tipe kepribadian
     Map<String, Color> typeColors = {
-      'D': Colors.red.shade400,
-      'I': Colors.orange.shade400,
-      'S': Colors.green.shade400,
-      'C': Colors.blue.shade400,
+      'D': Colors.green.shade400,
+      'I': Colors.red.shade400,
+      'S': Colors.blue.shade400,
+      'C': Colors.orange.shade400,
     };
 
     return Scaffold(

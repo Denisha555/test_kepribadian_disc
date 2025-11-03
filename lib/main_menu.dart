@@ -1,3 +1,4 @@
+import 'package:aplikasi_tes_kepribadian/profil.dart';
 import 'package:aplikasi_tes_kepribadian/quis.dart';
 import 'package:flutter/material.dart';
 
@@ -15,7 +16,16 @@ class _MainMenuState extends State<MainMenu> {
     setState(() {
       _selectedIndex = index;
     });
-    // Add navigation logic based on index
+    if (index == 0) {
+      // Navigate to History page
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainMenu()));
+    } else if (index == 1) {
+      // Navigate to History page
+      // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => History()));
+    } else if (index == 2) {
+      // Navigate to Profile page
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Profil()));
+    }
   }
 
   @override

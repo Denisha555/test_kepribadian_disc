@@ -1,3 +1,4 @@
+import 'package:aplikasi_tes_kepribadian/daftar.dart';
 import 'package:aplikasi_tes_kepribadian/main_menu.dart';
 import 'package:flutter/material.dart';
 
@@ -187,7 +188,7 @@ class _LoginState extends State<Login> {
                             height: 50,
                             child: OutlinedButton(
                               onPressed: () {
-                                // Navigate to registration page
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => Daftar()));
                               },
                               style: OutlinedButton.styleFrom(
                                 foregroundColor: Colors.blue.shade600,
