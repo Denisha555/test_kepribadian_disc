@@ -115,18 +115,17 @@ class _MainMenuState extends State<MainMenu> {
                       _buildDiscType(
                         'D',
                         'Dominance',
-                        'Tegas & berorientasi hasil',
                       ),
                       _buildDiscType(
                         'I',
                         'Influence',
-                        'Antusias & suka bersosialisasi',
                       ),
-                      _buildDiscType('S', 'Steadiness', 'Sabar & suportif'),
+                      _buildDiscType(
+                        'S', 
+                        'Steadiness'),
                       _buildDiscType(
                         'C',
                         'Conscientiousness',
-                        'Teliti & analitis',
                       ),
                       const SizedBox(height: 12),
                       const Text(
@@ -238,7 +237,7 @@ class _MainMenuState extends State<MainMenu> {
     );
   }
 
-  Widget _buildDiscType(String letter, String title, String description) {
+  Widget _buildDiscType(String letter, String title) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
@@ -263,25 +262,13 @@ class _MainMenuState extends State<MainMenu> {
           ),
           const SizedBox(width: 12),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                Text(
-                  description,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.white.withOpacity(0.9),
-                  ),
-                ),
-              ],
+            child: Text(
+              title,
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
             ),
           ),
         ],

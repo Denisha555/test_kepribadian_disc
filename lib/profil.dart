@@ -24,7 +24,7 @@ class _ProfilState extends State<Profil> {
       _selectedIndex = index;
     });
     if (index == 0) {
-      // Navigate to History page
+      // Navigate to Main Menu page
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainMenu()));
     } else if (index == 1) {
       // Navigate to History page

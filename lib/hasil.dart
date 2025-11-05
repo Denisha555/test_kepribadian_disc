@@ -307,57 +307,57 @@ class Hasil extends StatelessWidget {
                     if (highestType == 'D') ...[
                       _buildDetailItem(
                         title: "Gaya Bekerja",
-                        content: D_result['Gaya bekerja']!,
+                        content: D_user_result['Gaya bekerja']!,
                       ),
                       _buildDetailItem(
                         title: "Hal-hal yang Dianggap Penting",
-                        content: D_result['Hal-hal yang dianggap penting']!,
+                        content: D_user_result['Hal-hal yang dianggap penting']!,
                       ),
                       _buildDetailItem(
                         title: "Rekan Kerja yang Dibutuhkan",
-                        content: D_result['Rekan kerja yang dibutuhkan']!,
+                        content: D_user_result['Rekan kerja yang dibutuhkan']!,
                         isLast: true,
                       ),
                     ] else if (highestType == 'I') ...[
                       _buildDetailItem(
                         title: "Gaya Bekerja",
-                        content: I_result['Gaya bekerja']!,
+                        content: I_user_result['Gaya bekerja']!,
                       ),
                       _buildDetailItem(
                         title: "Hal-hal yang Dianggap Penting",
-                        content: I_result['Hal-hal yang dianggap penting']!,
+                        content: I_user_result['Hal-hal yang dianggap penting']!,
                       ),
                       _buildDetailItem(
                         title: "Rekan Kerja yang Dibutuhkan",
-                        content: I_result['Rekan kerja yang dibutuhkan']!,
+                        content: I_user_result['Rekan kerja yang dibutuhkan']!,
                         isLast: true,
                       ),
                     ] else if (highestType == 'S') ...[
                       _buildDetailItem(
                         title: "Gaya Bekerja",
-                        content: S_result['Gaya bekerja']!,
+                        content: S_user_result['Gaya bekerja']!,
                       ),
                       _buildDetailItem(
                         title: "Hal-hal yang Dianggap Penting",
-                        content: S_result['Hal-hal yang dianggap penting']!,
+                        content: S_user_result['Hal-hal yang dianggap penting']!,
                       ),
                       _buildDetailItem(
                         title: "Rekan Kerja yang Dibutuhkan",
-                        content: S_result['Rekan kerja yang dibutuhkan']!,
+                        content: S_user_result['Rekan kerja yang dibutuhkan']!,
                         isLast: true,
                       ),
                     ] else if (highestType == 'C') ...[
                       _buildDetailItem(
                         title: "Gaya Bekerja",
-                        content: C_result['Gaya bekerja']!,
+                        content: C_user_result['Gaya bekerja']!,
                       ),
                       _buildDetailItem(
                         title: "Hal-hal yang Dianggap Penting",
-                        content: C_result['Hal-hal yang dianggap penting']!,
+                        content: C_user_result['Hal-hal yang dianggap penting']!,
                       ),
                       _buildDetailItem(
                         title: "Rekan Kerja yang Dibutuhkan",
-                        content: C_result['Rekan kerja yang dibutuhkan']!,
+                        content: C_user_result['Rekan kerja yang dibutuhkan']!,
                         isLast: true,
                       ),
                     ],
