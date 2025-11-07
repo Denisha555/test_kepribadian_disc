@@ -473,6 +473,39 @@ class _HasilState extends State<Hasil> {
                             backgroundColor: Colors.green,
                           ),
                         );
+                        if (_jabatan == "Manager") {
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => BottomNavigationManager(
+                                    username: widget.username,
+                                    nama: userData!["nama"],
+                                    umur: userData!["umur"],
+                                    email: userData!["email"],
+                                    jabatan: userData!["jabatan"],
+                                    bidang: userData!["bidang"],
+                                  ),
+                            ),
+                            (context) => false,
+                          );
+                        } else if (_jabatan == "Karyawan") {
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => BottomNavigationUser(
+                                    username: widget.username,
+                                    nama: userData!["nama"],
+                                    umur: userData!["umur"],
+                                    email: userData!["email"],
+                                    jabatan: userData!["jabatan"],
+                                    bidang: userData!["bidang"],
+                                  ),
+                            ),
+                            (context) => false,
+                          );
+                        }
                       },
                       label: Text('Simpan'),
                       style: ElevatedButton.styleFrom(

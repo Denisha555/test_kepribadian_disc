@@ -43,7 +43,9 @@ class _BottomNavigationManagerState extends State<BottomNavigationManager> {
       MainMenu(
         username: widget.username,
       ), 
-      Manage(),
+      Manage(
+        bidang: widget.bidang,
+      ),
       Profil(
         username: widget.username,
       ),
