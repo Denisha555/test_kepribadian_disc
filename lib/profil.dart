@@ -1,8 +1,15 @@
+import 'package:aplikasi_tes_kepribadian/firebase/firebase_masuk_daftar.dart';
+import 'package:aplikasi_tes_kepribadian/main.dart';
 import 'package:aplikasi_tes_kepribadian/main_menu.dart';
 import 'package:flutter/material.dart';
 
 class Profil extends StatefulWidget {
-  const Profil({super.key});
+  final String username;
+  
+  const Profil({
+    super.key,
+    required this.username,
+  });
 
   @override
   State<Profil> createState() => _ProfilState();
@@ -13,25 +20,39 @@ class _ProfilState extends State<Profil> {
   final _emailController = TextEditingController();
   final _umurController = TextEditingController();
   final _bidangController = TextEditingController();
-  final _tipeDiscController = TextEditingController();
 
   bool _isEditing = false;
 
-  int _selectedIndex = 2;
+  Map<String, dynamic>? userData = {};
+  String? _tipe = '';
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-    if (index == 0) {
-      // Navigate to Main Menu page
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainMenu()));
-    } else if (index == 1) {
-      // Navigate to History page
-      // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => History()));
-    } else if (index == 2) {
-      // Navigate to Profile page
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Profil()));
+  @override
+  void initState() {
+    super.initState();
+    loadData();
+  }
+
+  @override
+  void dispose() {
+    _namaLengkapController.dispose();
+    _emailController.dispose();
+    _umurController.dispose();
+    _bidangController.dispose();
+    super.dispose();
+  }
+
+  void loadData() async {
+    userData = await FirebaseMasukDaftar().getData(widget.username);
+
+    if (userData != null) {
+      setState(() {
+        _namaLengkapController.text = userData!["nama"];
+        _emailController.text = userData!["email"];
+        _umurController.text = userData!["umur"];
+        _bidangController.text = userData!["bidang"];
+        _tipe = userData!["tipe"];
+      });
+      
     }
   }
 
@@ -140,9 +161,9 @@ class _ProfilState extends State<Profil> {
                                 color: Colors.blue.shade600,
                               ),
                             ),
-                            SizedBox(height: 10),
+                            SizedBox(height: 5),
                             Text(
-                              "User",
+                              widget.username,
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
@@ -162,7 +183,7 @@ class _ProfilState extends State<Profil> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(
-                      top: 180,
+                      top: 160,
                       left: 20,
                       right: 20,
                       bottom: 30,
@@ -202,9 +223,9 @@ class _ProfilState extends State<Profil> {
                                 ),
                                 child: Center(
                                   child: Text(
-                                    _tipeDiscController.text.isEmpty
+                                    _tipe == '' || _tipe == null
                                         ? '-'
-                                        : _tipeDiscController.text,
+                                        : _tipe![0],
                                     style: TextStyle(
                                       fontSize: 24,
                                       fontWeight: FontWeight.bold,
@@ -228,11 +249,9 @@ class _ProfilState extends State<Profil> {
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
-                                      _tipeDiscController.text.isEmpty
+                                      _tipe == '' || _tipe == null
                                           ? 'Belum melakukan tes'
-                                          : _getTypeName(
-                                            _tipeDiscController.text,
-                                          ),
+                                          : _tipe!,
                                       style: const TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
@@ -292,6 +311,55 @@ class _ProfilState extends State<Profil> {
                         ),
 
                         const SizedBox(height: 24),
+
+                        Center(
+                          child: TextButton(onPressed: (){
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: const Text('Konfirmasi Logout'),
+                                  content: const Text('Apakah Anda yakin ingin logout?'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Text('Batal', style: TextStyle(color: Colors.black)),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.pushAndRemoveUntil(
+                                          context,
+                                          MaterialPageRoute(builder: (context) => Login()),
+                                          (route) => false,
+                                        );
+                                      },
+                                      child: const Text('Logout', style: TextStyle(color: Colors.red)),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          }, child: Container(
+                            width: 200,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            decoration: BoxDecoration(
+                              color: Colors.blue.shade400,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Center(
+                              child: Text(
+                                'Logout',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          )),
+                        )
                       ],
                     ),
                   ),
@@ -299,46 +367,6 @@ class _ProfilState extends State<Profil> {
               ),
             ],
           ),
-        ),
-      ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.shade300,
-              blurRadius: 10,
-              offset: const Offset(0, -2),
-            ),
-          ],
-        ),
-        child: BottomNavigationBar(
-          currentIndex: _selectedIndex,
-          onTap: _onItemTapped,
-          selectedItemColor: Colors.blue.shade600,
-          unselectedItemColor: Colors.grey.shade400,
-          selectedFontSize: 12,
-          unselectedFontSize: 12,
-          type: BottomNavigationBarType.fixed,
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home_outlined),
-              activeIcon: Icon(Icons.home),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.history_outlined),
-              activeIcon: Icon(Icons.history),
-              label: 'History',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person_outline),
-              activeIcon: Icon(Icons.person),
-              label: 'Profile',
-            ),
-          ],
         ),
       ),
     );
@@ -369,6 +397,67 @@ class _ProfilState extends State<Profil> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildDropdownField({
+    required List<String> items,
+    required String label,
+  }) {
+    return DropdownButtonFormField<String>(
+      value: items[0],
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(color: Colors.blue.shade400),
+        prefixIcon: Icon(
+          Icons.badge,
+          color: Colors.blue.shade400,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.blue.shade100, width: 1),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.blue.shade400, width: 2),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.red, width: 1),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.red, width: 2),
+        ),
+        filled: true,
+        fillColor: Colors.white,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 16,
+        ),
+      ),
+      hint: Text('Pilih $label'),
+      items: items.map((String item) {
+        return DropdownMenuItem<String>(
+          value: item,
+          child: Text(item),
+        );
+      }).toList(),
+      onChanged: (String? newValue) {
+        setState(() {
+         
+        });
+      },
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Silakan pilih $label';
+        }
+        return null;
+      },
     );
   }
 
@@ -448,15 +537,5 @@ class _ProfilState extends State<Profil> {
       default:
         return 'Tidak diketahui';
     }
-  }
-
-  @override
-  void dispose() {
-    _namaLengkapController.dispose();
-    _emailController.dispose();
-    _umurController.dispose();
-    _bidangController.dispose();
-    _tipeDiscController.dispose();
-    super.dispose();
   }
 }

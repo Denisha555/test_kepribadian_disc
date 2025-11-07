@@ -1,16 +1,41 @@
+import 'package:aplikasi_tes_kepribadian/bottom_navigation_manager.dart';
+import 'package:aplikasi_tes_kepribadian/bottom_navigation_user.dart';
 import 'package:aplikasi_tes_kepribadian/disc.dart';
+import 'package:aplikasi_tes_kepribadian/firebase/firebase_edit_data.dart';
+import 'package:aplikasi_tes_kepribadian/firebase/firebase_masuk_daftar.dart';
+import 'package:aplikasi_tes_kepribadian/main_menu.dart';
 import 'package:flutter/material.dart';
 
-class Hasil extends StatelessWidget {
-  const Hasil({super.key});
+class Hasil extends StatefulWidget {
+  final Map<String, int> scores;
+  final String username;
+
+  const Hasil({super.key, required this.scores, required this.username});
+
+  @override
+  State<Hasil> createState() => _HasilState();
+}
+
+class _HasilState extends State<Hasil> {
+  String _jabatan = '';
+  Map<String, dynamic>? userData = {};
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    loadData();
+  }
+
+  void loadData() async {
+    _jabatan = await FirebaseMasukDaftar().checkJabatan(widget.username);
+    userData = await FirebaseMasukDaftar().getData(widget.username);
+  }
 
   @override
   Widget build(BuildContext context) {
-    final scores =
-        ModalRoute.of(context)!.settings.arguments as Map<String, int>;
-
     final highestType =
-        scores.entries.reduce((a, b) => a.value > b.value ? a : b).key;
+        widget.scores.entries.reduce((a, b) => a.value > b.value ? a : b).key;
 
     // Warna untuk setiap tipe kepribadian
     Map<String, Color> typeColors = {
@@ -31,10 +56,7 @@ class Hasil extends StatelessWidget {
         ),
         title: const Text(
           'Hasil Tes',
-          style: TextStyle(
-            color: Colors.black87,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
       ),
@@ -51,10 +73,7 @@ class Hasil extends StatelessWidget {
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [
-                      Colors.blue.shade400,
-                      Colors.purple.shade400,
-                    ],
+                    colors: [Colors.blue.shade400, Colors.purple.shade400],
                   ),
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
@@ -207,10 +226,12 @@ class Hasil extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 20),
-                    ...scores.entries.map((entry) {
-                      int maxScore = scores.values.reduce((a, b) => a > b ? a : b);
+                    ...widget.scores.entries.map((entry) {
+                      int maxScore = widget.scores.values.reduce(
+                        (a, b) => a > b ? a : b,
+                      );
                       double percentage = entry.value / maxScore;
-                      
+
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 16.0),
                         child: Column(
@@ -282,7 +303,7 @@ class Hasil extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: Colors.purple.shade400,
+                            color: Colors.blue.shade400,
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Icon(
@@ -303,7 +324,7 @@ class Hasil extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 20),
-                    
+
                     if (highestType == 'D') ...[
                       _buildDetailItem(
                         title: "Gaya Bekerja",
@@ -311,11 +332,16 @@ class Hasil extends StatelessWidget {
                       ),
                       _buildDetailItem(
                         title: "Hal-hal yang Dianggap Penting",
-                        content: D_user_result['Hal-hal yang dianggap penting']!,
+                        content:
+                            D_user_result['Hal-hal yang dianggap penting']!,
                       ),
                       _buildDetailItem(
                         title: "Rekan Kerja yang Dibutuhkan",
                         content: D_user_result['Rekan kerja yang dibutuhkan']!,
+                      ),
+                      _buildDetailItem(
+                        title: "Saran",
+                        content: D_user_result['Saran']!,
                         isLast: true,
                       ),
                     ] else if (highestType == 'I') ...[
@@ -325,11 +351,16 @@ class Hasil extends StatelessWidget {
                       ),
                       _buildDetailItem(
                         title: "Hal-hal yang Dianggap Penting",
-                        content: I_user_result['Hal-hal yang dianggap penting']!,
+                        content:
+                            I_user_result['Hal-hal yang dianggap penting']!,
                       ),
                       _buildDetailItem(
                         title: "Rekan Kerja yang Dibutuhkan",
                         content: I_user_result['Rekan kerja yang dibutuhkan']!,
+                      ),
+                      _buildDetailItem(
+                        title: "Saran",
+                        content: I_user_result['Saran']!,
                         isLast: true,
                       ),
                     ] else if (highestType == 'S') ...[
@@ -339,11 +370,16 @@ class Hasil extends StatelessWidget {
                       ),
                       _buildDetailItem(
                         title: "Hal-hal yang Dianggap Penting",
-                        content: S_user_result['Hal-hal yang dianggap penting']!,
+                        content:
+                            S_user_result['Hal-hal yang dianggap penting']!,
                       ),
                       _buildDetailItem(
                         title: "Rekan Kerja yang Dibutuhkan",
                         content: S_user_result['Rekan kerja yang dibutuhkan']!,
+                      ),
+                      _buildDetailItem(
+                        title: "Saran",
+                        content: S_user_result['Saran']!,
                         isLast: true,
                       ),
                     ] else if (highestType == 'C') ...[
@@ -353,11 +389,16 @@ class Hasil extends StatelessWidget {
                       ),
                       _buildDetailItem(
                         title: "Hal-hal yang Dianggap Penting",
-                        content: C_user_result['Hal-hal yang dianggap penting']!,
+                        content:
+                            C_user_result['Hal-hal yang dianggap penting']!,
                       ),
                       _buildDetailItem(
                         title: "Rekan Kerja yang Dibutuhkan",
                         content: C_user_result['Rekan kerja yang dibutuhkan']!,
+                      ),
+                      _buildDetailItem(
+                        title: "Saran",
+                        content: C_user_result['Saran']!,
                         isLast: true,
                       ),
                     ],
@@ -372,16 +413,45 @@ class Hasil extends StatelessWidget {
                 children: [
                   Expanded(
                     child: OutlinedButton.icon(
-                      onPressed: () {
-
+                      onPressed: () async {
+                        if (_jabatan == "Manager") {
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => BottomNavigationManager(
+                                    username: widget.username,
+                                    nama: userData!["nama"],
+                                    umur: userData!["umur"],
+                                    email: userData!["email"],
+                                    jabatan: userData!["jabatan"],
+                                    bidang: userData!["bidang"],
+                                  ),
+                            ),
+                            (route) => false,
+                          );
+                        } else if (_jabatan == "Karyawan") {
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => BottomNavigationUser(
+                                    username: widget.username,
+                                    nama: userData!["nama"],
+                                    umur: userData!["umur"],
+                                    email: userData!["email"],
+                                    jabatan: userData!["jabatan"],
+                                    bidang: userData!["bidang"],
+                                  ),
+                            ),
+                            (route) => false,
+                          );
+                        }
                       },
                       label: Text('Beranda'),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: Colors.blue.shade400,
-                        side: BorderSide(
-                          color: Colors.blue.shade400,
-                          width: 2,
-                        ),
+                        side: BorderSide(color: Colors.blue.shade400, width: 2),
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -393,7 +463,16 @@ class Hasil extends StatelessWidget {
                   Expanded(
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        
+                        FirebaseEditData().updateTipe(
+                          widget.username,
+                          _getTypeName(highestType),
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Tipe berhasil disimpan'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
                       },
                       label: Text('Simpan'),
                       style: ElevatedButton.styleFrom(
@@ -447,7 +526,7 @@ class Hasil extends StatelessWidget {
             color: Colors.grey.shade600,
             height: 1.5,
           ),
-          textAlign: TextAlign.justify
+          textAlign: TextAlign.justify,
         ),
         if (!isLast) const SizedBox(height: 20),
       ],

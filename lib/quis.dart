@@ -1,9 +1,14 @@
+import 'package:aplikasi_tes_kepribadian/bottom_navigation_manager.dart';
+import 'package:aplikasi_tes_kepribadian/bottom_navigation_user.dart';
+import 'package:aplikasi_tes_kepribadian/firebase/firebase_masuk_daftar.dart';
 import 'package:aplikasi_tes_kepribadian/hasil.dart';
 import 'package:flutter/material.dart';
 import 'package:aplikasi_tes_kepribadian/disc.dart';
 
 class Quis extends StatefulWidget {
-  const Quis({super.key});
+  final String username;
+
+  const Quis({super.key, required this.username});
 
   @override
   State<Quis> createState() => _QuisState();
@@ -13,6 +18,34 @@ class _QuisState extends State<Quis> {
   int currentIndex = 0;
   int? selectedAnswerIndex;
   Map<String, int> scores = {'D': 0, 'I': 0, 'S': 0, 'C': 0};
+  Map<String, dynamic>? userData = {};
+  String jabatan = '';
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    try {
+      userData = await FirebaseMasukDaftar().getData(widget.username);
+      if (userData != null && mounted) {
+        setState(() {
+          jabatan = userData!['jabatan'];
+          isLoading = false; // Set loading selesai
+        });
+      }
+    } catch (e) {
+      print('Error loading data: $e');
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+  }
 
   void selectAnswer(int index) {
     setState(() {
@@ -24,7 +57,10 @@ class _QuisState extends State<Quis> {
     if (selectedAnswerIndex == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text("Pilih salah satu jawaban terlebih dahulu!", style: TextStyle(color: Colors.black),),
+          content: const Text(
+            "Pilih salah satu jawaban terlebih dahulu!",
+            style: TextStyle(color: Colors.black),
+          ),
           backgroundColor: Colors.grey.shade50,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
@@ -46,9 +82,13 @@ class _QuisState extends State<Quis> {
       });
     } else {
       // Tes selesai → pindah ke halaman hasil
-      Navigator.pushReplacement(
+      Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => Hasil(), settings: RouteSettings(arguments: scores)),
+        MaterialPageRoute(
+          builder:
+              (context) => Hasil(scores: scores, username: widget.username),
+        ),
+        (route) => false,
       );
     }
   }
@@ -66,6 +106,13 @@ class _QuisState extends State<Quis> {
   Widget build(BuildContext context) {
     List<String> answers = questions[currentIndex];
     double progress = (currentIndex + 1) / questions.length;
+
+    if (isLoading) {
+      return Scaffold(
+        backgroundColor: Colors.grey.shade50,
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
 
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
@@ -95,7 +142,41 @@ class _QuisState extends State<Quis> {
                         ),
                       ),
                       TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          if (jabatan == 'Karyawan') {
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (context) => BottomNavigationUser(
+                                      username: userData!['username'],
+                                      email: userData!['email'],
+                                      umur: userData!['umur'],
+                                      jabatan: userData!['jabatan'],
+                                      nama: userData!['nama'],
+                                      bidang: userData!['bidang'],
+                                    ),
+                              ),
+                              (route) => false,
+                            );
+                          } else if (jabatan == 'Manager') {
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (context) => BottomNavigationManager(
+                                      username: userData!['username'],
+                                      email: userData!['email'],
+                                      umur: userData!['umur'],
+                                      jabatan: userData!['jabatan'],
+                                      nama: userData!['nama'],
+                                      bidang: userData!['bidang'],
+                                    ),
+                              ),
+                              (route) => false,
+                            );
+                          }
+                        },
                         child: Text(
                           'Keluar',
                           style: TextStyle(color: Colors.red.shade600),

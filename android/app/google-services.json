@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "259765583265",
+    "project_id": "testdisc-1d691",
+    "storage_bucket": "testdisc-1d691.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:259765583265:android:bd9bf6db55ee41980ddfe0",
+        "android_client_info": {
+          "package_name": "com.example.aplikasi_tes_kepribadian"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDVeKdKIcvNjxIpXpDExQffkgKlEtVFAEg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

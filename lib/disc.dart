@@ -28,7 +28,7 @@ const I = [
   "Ceria dan optimis",
   "Memiliki kemampuan komunikasi dan persuasi yang baik",
   "Bergerak dengan ritme yang cepat",
-  "Cenderung hanya mendengarkan bagian yang ingin didengarnya",
+  "Cenderung hanya mendengarkan bagian yang ingin didengar",
   "Memiliki keinginan yang kuat untuk memengaruhi dan memberi pengaruh pada orang lain",
   "Suka mengikuti tren-tren baru",
   "Kurang terampil dalam membuat persiapan dan perencanaan",

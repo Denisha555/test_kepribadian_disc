@@ -3,31 +3,15 @@ import 'package:aplikasi_tes_kepribadian/quis.dart';
 import 'package:flutter/material.dart';
 
 class MainMenu extends StatefulWidget {
-  const MainMenu({super.key});
+  final String username; 
+
+  const MainMenu({super.key, required this.username});
 
   @override
   State<MainMenu> createState() => _MainMenuState();
 }
 
 class _MainMenuState extends State<MainMenu> {
-  int _selectedIndex = 0;
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-    if (index == 0) {
-      // Navigate to History page
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainMenu()));
-    } else if (index == 1) {
-      // Navigate to History page
-      // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => History()));
-    } else if (index == 2) {
-      // Navigate to Profile page
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Profil()));
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,8 +24,8 @@ class _MainMenuState extends State<MainMenu> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Welcome Section
-              const Text(
-                'Hi, User 👋',
+              Text(
+                'Hi, ${widget.username} 👋',
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
@@ -104,7 +88,7 @@ class _MainMenuState extends State<MainMenu> {
                       ),
                       const SizedBox(height: 16),
                       const Text(
-                        'DISC adalah tes kepribadian yang mengidentifikasi 4 tipe perilaku utama:',
+                        'DISC adalah tes yang mengidentifikasi 4 tipe kepribadian utama:',
                         style: TextStyle(
                           fontSize: 15,
                           color: Colors.white,
@@ -149,7 +133,7 @@ class _MainMenuState extends State<MainMenu> {
                   Expanded(
                     child: _buildStatCard(
                       Icons.quiz_outlined,
-                      '20',
+                      '15',
                       'Questions',
                       Colors.orange,
                     ),
@@ -158,7 +142,7 @@ class _MainMenuState extends State<MainMenu> {
                   Expanded(
                     child: _buildStatCard(
                       Icons.timer_outlined,
-                      '10-15',
+                      '5-10',
                       'Minutes',
                       Colors.green,
                     ),
@@ -173,7 +157,7 @@ class _MainMenuState extends State<MainMenu> {
                 height: 56,
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => Quis()));
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => Quis(username: widget.username,)));
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue.shade600,
@@ -192,46 +176,6 @@ class _MainMenuState extends State<MainMenu> {
               const SizedBox(height: 16),
             ],
           ),
-        ),
-      ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.shade300,
-              blurRadius: 10,
-              offset: const Offset(0, -2),
-            ),
-          ],
-        ),
-        child: BottomNavigationBar(
-          currentIndex: _selectedIndex,
-          onTap: _onItemTapped,
-          selectedItemColor: Colors.blue.shade600,
-          unselectedItemColor: Colors.grey.shade400,
-          selectedFontSize: 12,
-          unselectedFontSize: 12,
-          type: BottomNavigationBarType.fixed,
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home_outlined),
-              activeIcon: Icon(Icons.home),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.history_outlined),
-              activeIcon: Icon(Icons.history),
-              label: 'History',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person_outline),
-              activeIcon: Icon(Icons.person),
-              label: 'Profile',
-            ),
-          ],
         ),
       ),
     );
