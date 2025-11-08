@@ -52,6 +52,15 @@ class _ProfilState extends State<Profil> {
 
   void loadData() async {
     userData = await FirebaseMasukDaftar().getData(widget.username);
+    final tipeList = userData?["tipe"];
+
+    if (tipeList is List && tipeList.isNotEmpty) {
+      _tipe = tipeList.last["hasil"] ?? "";
+      _jumlahTes = tipeList.length;
+    } else {
+      _tipe = "";
+      _jumlahTes = 0;
+    }
 
     if (userData != null) {
       setState(() {
@@ -60,8 +69,8 @@ class _ProfilState extends State<Profil> {
         _umurController.text = userData!["umur"];
         _gender = userData!["gender"];
         _bidang = userData!["bidang"];
-        _tipe = userData!["tipe"].last["hasil"];
-        _jumlahTes = userData!["tipe"].length;
+        _tipe = _tipe;
+        _jumlahTes = _jumlahTes;
       });
     }
   }
@@ -252,12 +261,14 @@ class _ProfilState extends State<Profil> {
                     Expanded(
                       child: GestureDetector(
                         onTap: () {
-                          Navigator.push(
+                          if (_tipe == 'Dominance' || _tipe == 'Influence' || _tipe == 'Steadiness' || _tipe == 'Compliance') {
+                            Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => DetailTipe(tipe: _tipe!),
                             ),
                           );
+                          }
                         },
                         child: Container(
                           padding: EdgeInsets.all(20),

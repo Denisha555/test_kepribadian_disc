@@ -4,6 +4,7 @@ import 'package:aplikasi_tes_kepribadian/disc.dart';
 import 'package:aplikasi_tes_kepribadian/firebase/firebase_edit_data.dart';
 import 'package:aplikasi_tes_kepribadian/firebase/firebase_masuk_daftar.dart';
 import 'package:flutter/material.dart';
+import 'package:fl_chart/fl_chart.dart';
 
 class Hasil extends StatefulWidget {
   final Map<String, int> scores;
@@ -29,20 +30,23 @@ class _HasilState extends State<Hasil> {
   void loadData() async {
     _jabatan = await FirebaseMasukDaftar().checkJabatan(widget.username);
     userData = await FirebaseMasukDaftar().getData(widget.username);
+    setState(() {
+      _jabatan = _jabatan;
+      userData = userData;
+    });
   }
+
+  Map<String, Color> typeColors = {
+    'D': Colors.green.shade400,
+    'I': Colors.red.shade400,
+    'S': Colors.blue.shade400,
+    'C': Colors.orange.shade400,
+  };
 
   @override
   Widget build(BuildContext context) {
     final highestType =
         widget.scores.entries.reduce((a, b) => a.value > b.value ? a : b).key;
-
-    // Warna untuk setiap tipe kepribadian
-    Map<String, Color> typeColors = {
-      'D': Colors.green.shade400,
-      'I': Colors.red.shade400,
-      'S': Colors.blue.shade400,
-      'C': Colors.orange.shade400,
-    };
 
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
@@ -198,6 +202,7 @@ class _HasilState extends State<Hasil> {
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Row(
                       children: [
@@ -224,55 +229,66 @@ class _HasilState extends State<Hasil> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 20),
-                    ...widget.scores.entries.map((entry) {
-                      int maxScore = widget.scores.values.reduce(
-                        (a, b) => a > b ? a : b,
-                      );
-                      double percentage = entry.value / maxScore;
 
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  '${entry.key} - ${_getTypeName(entry.key)}',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.grey.shade700,
-                                  ),
+                    const SizedBox(height: 20),
+
+                    // _buildDonutChart(),
+
+                    Row(
+                      children: [
+                        _buildDonutChart(),
+                        SizedBox(width: 15,),
+                        Expanded(
+                          child: Column(
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.green.shade400,
+                                  borderRadius: BorderRadius.circular(10),
                                 ),
-                                Text(
-                                  '${entry.value}',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: typeColors[entry.key],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: LinearProgressIndicator(
-                                value: percentage,
-                                minHeight: 12,
-                                backgroundColor: Colors.grey.shade200,
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  typeColors[entry.key]!,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(10.0),
+                                  child: Center(child: Text("Dominance", style: TextStyle(color: Colors.white),)),
                                 ),
                               ),
-                            ),
-                          ],
+                              SizedBox(height: 10,),
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.red.shade400,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(10.0),
+                                  child: Center(child: Text("Influence", style: TextStyle(color: Colors.white),)),
+                                ),
+                              ),
+                              SizedBox(height: 10,),
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.blue.shade400,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(10.0),
+                                  child: Center(child: Text("Steadiness", style: TextStyle(color: Colors.white),)),
+                                ),
+                              ),
+                              SizedBox(height: 10,),
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.orange.shade400,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(10.0),
+                                  child: Center(child: Text("Compliance", style: TextStyle(color: Colors.white),)),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      );
-                    }).toList(),
+                      ],
+                    )
                   ],
                 ),
               ),
@@ -523,6 +539,34 @@ class _HasilState extends State<Hasil> {
               const SizedBox(height: 20),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDonutChart() {
+    return SizedBox(
+      height: 200, 
+      width: 150,  
+      child: PieChart(
+        PieChartData(
+          centerSpaceRadius: 20,
+          sectionsSpace: 1,
+          sections:
+              widget.scores.entries.map((entry) {
+                final color = typeColors[entry.key] ?? Colors.blue;
+                return PieChartSectionData(
+                  value: entry.value.toDouble(),
+                  title: '${entry.value}',
+                  color: color,
+                  radius: 60,
+                  titleStyle: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                );
+              }).toList(),
         ),
       ),
     );
