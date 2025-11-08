@@ -15,6 +15,7 @@ class _DaftarState extends State<Daftar> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   final _namaLengkapController = TextEditingController();
+  final _genderController = TextEditingController();
   final _emailController = TextEditingController();
   final _umurController = TextEditingController();
   final _bidangController = TextEditingController();
@@ -23,7 +24,12 @@ class _DaftarState extends State<Daftar> {
   bool _obscureConfirmPassword = true;
   String _jabatan = '';
   String _bidang = '';
+  String _gender = '';
 
+  final List<String> _genderList = [
+    'Female',
+    'Male',
+  ];
   final List<String> _jabatanList = [
     'Manager', 
     'Karyawan'];
@@ -41,6 +47,7 @@ class _DaftarState extends State<Daftar> {
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     _namaLengkapController.dispose();
+    _genderController.dispose();
     _emailController.dispose();
     _umurController.dispose();
     _bidangController.dispose();
@@ -52,6 +59,7 @@ class _DaftarState extends State<Daftar> {
     super.initState();
     _jabatan = _jabatanList[0];
     _bidang = _bidangList[0];
+    _gender = _genderList[0];
   }
 
   Widget _buildTextField({
@@ -202,6 +210,7 @@ class _DaftarState extends State<Daftar> {
             _umurController.text,
             _jabatan,
             _bidang,
+            _gender
           );
 
           ScaffoldMessenger.of(context).showSnackBar(
@@ -374,6 +383,10 @@ class _DaftarState extends State<Daftar> {
                       return null;
                     },
                   ),
+                  const SizedBox(height: 16),
+
+                  //Gender (Dropdown)
+                  _buildDropdownField(items: _genderList, label: "Gender"),
                   const SizedBox(height: 16),
 
                   // Jabatan (Dropdown)

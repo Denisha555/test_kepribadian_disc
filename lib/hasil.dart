@@ -3,7 +3,6 @@ import 'package:aplikasi_tes_kepribadian/bottom_navigation_user.dart';
 import 'package:aplikasi_tes_kepribadian/disc.dart';
 import 'package:aplikasi_tes_kepribadian/firebase/firebase_edit_data.dart';
 import 'package:aplikasi_tes_kepribadian/firebase/firebase_masuk_daftar.dart';
-import 'package:aplikasi_tes_kepribadian/main_menu.dart';
 import 'package:flutter/material.dart';
 
 class Hasil extends StatefulWidget {

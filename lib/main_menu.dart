@@ -19,7 +19,7 @@ class _MainMenuState extends State<MainMenu> {
 
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.only(left: 20, right: 20, top: 30, bottom: 30),
+          padding: const EdgeInsets.only(left: 20, right: 20, top: 50, bottom: 30),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -168,7 +168,7 @@ class _MainMenuState extends State<MainMenu> {
                     elevation: 3,
                   ),
                   child: Text(
-                    'Mulai Test',
+                    'Start Test',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ),

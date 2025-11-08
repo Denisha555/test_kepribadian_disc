@@ -14,9 +14,6 @@ class FirebaseGetData {
     for (var doc in querySnapshot.docs) {
       employees.add(doc.data());
     }
-
-    print(employees);
-
     return employees;
   }
 }

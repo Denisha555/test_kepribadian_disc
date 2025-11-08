@@ -35,6 +35,7 @@ class FirebaseMasukDaftar {
     String umur,
     String jabatan,
     String bidang,
+    String gender,
   ) async {
     await FirebaseFirestore.instance.collection('users').add({
       'username': username,
@@ -44,6 +45,7 @@ class FirebaseMasukDaftar {
       'umur': umur,
       'jabatan': jabatan,
       'bidang': bidang,
+      'gender': gender,
     });
   }
 
