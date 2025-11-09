@@ -79,21 +79,21 @@ class _ProfilState extends State<Profil> {
     try {
       await FirebaseEditData().updateData(
         widget.username,
-        "nama",
         _namaLengkapController.text,
+        "nama",
       );
       await FirebaseEditData().updateData(
         widget.username,
-        "email",
         _emailController.text,
+        "email",
       );
       await FirebaseEditData().updateData(
         widget.username,
-        "umur",
         _umurController.text,
+        "umur",
       );
-      await FirebaseEditData().updateData(widget.username, "bidang", _bidang!);
-      await FirebaseEditData().updateData(widget.username, "gender", _gender!);
+      await FirebaseEditData().updateData(widget.username, _bidang!, "bidang", );
+      await FirebaseEditData().updateData(widget.username, _gender!, "gender", );
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -261,13 +261,16 @@ class _ProfilState extends State<Profil> {
                     Expanded(
                       child: GestureDetector(
                         onTap: () {
-                          if (_tipe == 'Dominance' || _tipe == 'Influence' || _tipe == 'Steadiness' || _tipe == 'Compliance') {
+                          if (_tipe == 'Dominance' ||
+                              _tipe == 'Influence' ||
+                              _tipe == 'Steadiness' ||
+                              _tipe == 'Compliance') {
                             Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => DetailTipe(tipe: _tipe!),
-                            ),
-                          );
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => DetailTipe(tipe: _tipe!),
+                              ),
+                            );
                           }
                         },
                         child: Container(
@@ -500,7 +503,7 @@ class _ProfilState extends State<Profil> {
                                   ),
                                 ),
                                 TextButton(
-                                  onPressed: (){
+                                  onPressed: () {
                                     Navigator.pushAndRemoveUntil(
                                       context,
                                       MaterialPageRoute(
@@ -508,11 +511,12 @@ class _ProfilState extends State<Profil> {
                                       ),
                                       (route) => false,
                                     );
-                                  }, 
+                                  },
                                   child: Text(
                                     'Logout',
                                     style: TextStyle(color: Colors.red),
-                                  ),)
+                                  ),
+                                ),
                               ],
                             );
                           },

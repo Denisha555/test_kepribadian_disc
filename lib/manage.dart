@@ -34,7 +34,7 @@ class _ManageState extends State<Manage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Manage')),
+      appBar: AppBar(title: const Text('Manage', style: TextStyle(fontWeight: FontWeight.bold),)),
       body:
           isLoading
               ? const Center(child: CircularProgressIndicator())
@@ -113,7 +113,7 @@ class DetailEmployee extends StatelessWidget {
                   const SizedBox(height: 8),
                   Chip(
                     label: Text(
-                      "Tipe: ${data["tipe"] ?? "-"}",
+                      "Tipe: ${data["tipe"].last["hasil"] ?? "-"}",
                       style: const TextStyle(color: Colors.white),
                     ),
                     backgroundColor: Colors.blue,
@@ -123,7 +123,7 @@ class DetailEmployee extends StatelessWidget {
             ),
             const SizedBox(height: 32),
 
-            if (data["tipe"] == "Dominance") ...[
+            if (data["tipe"].last["hasil"] == "Dominance") ...[
               Text(
                 'Hal Yang Memotivasinya',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -155,7 +155,7 @@ class DetailEmployee extends StatelessWidget {
                 D_manager_result["Lingkungan kerja yang ideal"]!,
                 textAlign: TextAlign.justify,
               ),
-            ] else if (data["tipe"] == "Influence") ...[
+            ] else if (data["tipe"].last["hasil"] == "Influence") ...[
               Text(
                 "Hal Yang Memotivasinya",
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -187,7 +187,7 @@ class DetailEmployee extends StatelessWidget {
                 I_manager_result["Lingkungan kerja yang ideal"]!,
                 textAlign: TextAlign.justify,
               ),
-            ] else if (data["tipe"] == "Steadiness") ...[
+            ] else if (data["tipe"].last["hasil"] == "Steadiness") ...[
               Text(
                 "Hal Yang Memotivasinya",
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -219,7 +219,7 @@ class DetailEmployee extends StatelessWidget {
                 S_manager_result["Lingkungan kerja yang ideal"]!,
                 textAlign: TextAlign.justify,
               ),
-            ] else if (data["tipe"] == "Compliance") ...[
+            ] else if (data["tipe"].last["hasil"] == "Compliance") ...[
               Text(
                 "Hal Yang Memotivasinya",
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),

@@ -23,7 +23,7 @@ class FirebaseEditData {
     final query =
         await FirebaseFirestore.instance
             .collection('users')
-            .where(key, isEqualTo: value)
+            .where("username", isEqualTo: username)
             .get();
 
     if (query.docs.isNotEmpty) {

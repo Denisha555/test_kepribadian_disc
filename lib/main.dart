@@ -30,6 +30,7 @@ class _LoginState extends State<Login> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _isloading = false;
 
   @override
   void dispose() {
@@ -172,6 +173,9 @@ class _LoginState extends State<Login> {
                                 );
                                 return;
                               }
+                              setState(() {
+                                _isloading = true;
+                              });
                               bool valid = await FirebaseMasukDaftar()
                                   .validateLogin(
                                     _usernameController.text,
@@ -217,6 +221,9 @@ class _LoginState extends State<Login> {
                                     ),
                                   );
                                 }
+                                setState(() {
+                                  _isloading = false;
+                                });
                               } else {
                                 showDialog(
                                   context: context,
@@ -235,6 +242,9 @@ class _LoginState extends State<Login> {
                                         ],
                                       ),
                                 );
+                                setState(() {
+                                  _isloading = false;
+                                });
                               }
                             },
                             style: ElevatedButton.styleFrom(
@@ -245,7 +255,9 @@ class _LoginState extends State<Login> {
                               ),
                               elevation: 2,
                             ),
-                            child: const Text(
+                            child: _isloading ? 
+                            CircularProgressIndicator(color: Colors.white,) :
+                            Text(
                               'Login',
                               style: TextStyle(
                                 fontSize: 16,
