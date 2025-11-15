@@ -1,39 +1,67 @@
 import 'package:aplikasi_tes_kepribadian/bottom_navigation_manager.dart';
 import 'package:aplikasi_tes_kepribadian/bottom_navigation_user.dart';
-import 'package:aplikasi_tes_kepribadian/disc.dart';
 import 'package:aplikasi_tes_kepribadian/firebase/firebase_edit_data.dart';
-import 'package:aplikasi_tes_kepribadian/firebase/firebase_masuk_daftar.dart';
+import 'package:aplikasi_tes_kepribadian/firebase/firebase_forward_chaining.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class Hasil extends StatefulWidget {
   final Map<String, int> scores;
+  final String highestType;
   final String username;
+  final String jabatan;
+  final Map<String, dynamic> userData;
 
-  const Hasil({super.key, required this.scores, required this.username});
+  const Hasil({
+    super.key,
+    required this.scores,
+    required this.highestType,
+    required this.username,
+    required this.jabatan,
+    required this.userData,
+  });
 
   @override
   State<Hasil> createState() => _HasilState();
 }
 
 class _HasilState extends State<Hasil> {
-  String _jabatan = '';
-  Map<String, dynamic>? userData = {};
+  var hasilD = [];
+  var hasilI = [];
+  var hasilS = [];
+  var hasilC = [];
+  bool isLoading = true; 
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     loadData();
   }
 
-  void loadData() async {
-    _jabatan = await FirebaseMasukDaftar().checkJabatan(widget.username);
-    userData = await FirebaseMasukDaftar().getData(widget.username);
-    setState(() {
-      _jabatan = _jabatan;
-      userData = userData;
-    });
+  Future<void> loadData() async {
+    try {
+      var tempD = await FirebaseForwardChaining().getHasilKaryawan("D");
+      var tempI = await FirebaseForwardChaining().getHasilKaryawan("I");
+      var tempS = await FirebaseForwardChaining().getHasilKaryawan("S");
+      var tempC = await FirebaseForwardChaining().getHasilKaryawan("C");
+
+      if (mounted) {
+        setState(() {
+          hasilD = tempD;
+          hasilI = tempI;
+          hasilS = tempS;
+          hasilC = tempC;
+          isLoading = false; 
+        });
+      }
+    } catch (e) {
+      print('Error loading data: $e');
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
   }
 
   Map<String, Color> typeColors = {
@@ -45,25 +73,19 @@ class _HasilState extends State<Hasil> {
 
   @override
   Widget build(BuildContext context) {
-    final highestType =
-        widget.scores.entries.reduce((a, b) => a.value > b.value ? a : b).key;
-
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.transparent,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black87),
-          onPressed: () => Navigator.pop(context),
-        ),
         title: const Text(
           'Hasil Tes',
           style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
+      body: isLoading ? 
+      Center(child: CircularProgressIndicator()) :
+      SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
           child: Column(
@@ -150,7 +172,7 @@ class _HasilState extends State<Hasil> {
                       height: 100,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: typeColors[highestType],
+                        color: typeColors[widget.highestType],
                         boxShadow: [
                           BoxShadow(
                             color: Colors.blue.shade200.withOpacity(0.5),
@@ -161,7 +183,7 @@ class _HasilState extends State<Hasil> {
                       ),
                       child: Center(
                         child: Text(
-                          highestType,
+                          widget.highestType,
                           style: const TextStyle(
                             fontSize: 48,
                             fontWeight: FontWeight.bold,
@@ -172,7 +194,7 @@ class _HasilState extends State<Hasil> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      _getTypeName(highestType),
+                      _getTypeName(widget.highestType),
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -232,12 +254,10 @@ class _HasilState extends State<Hasil> {
 
                     const SizedBox(height: 20),
 
-                    // _buildDonutChart(),
-
                     Row(
                       children: [
                         _buildDonutChart(),
-                        SizedBox(width: 15,),
+                        SizedBox(width: 15),
                         Expanded(
                           child: Column(
                             children: [
@@ -248,10 +268,15 @@ class _HasilState extends State<Hasil> {
                                 ),
                                 child: Padding(
                                   padding: const EdgeInsets.all(10.0),
-                                  child: Center(child: Text("Dominance", style: TextStyle(color: Colors.white),)),
+                                  child: Center(
+                                    child: Text(
+                                      "Dominance",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
                                 ),
                               ),
-                              SizedBox(height: 10,),
+                              SizedBox(height: 10),
                               Container(
                                 decoration: BoxDecoration(
                                   color: Colors.red.shade400,
@@ -259,10 +284,15 @@ class _HasilState extends State<Hasil> {
                                 ),
                                 child: Padding(
                                   padding: const EdgeInsets.all(10.0),
-                                  child: Center(child: Text("Influence", style: TextStyle(color: Colors.white),)),
+                                  child: Center(
+                                    child: Text(
+                                      "Influence",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
                                 ),
                               ),
-                              SizedBox(height: 10,),
+                              SizedBox(height: 10),
                               Container(
                                 decoration: BoxDecoration(
                                   color: Colors.blue.shade400,
@@ -270,10 +300,15 @@ class _HasilState extends State<Hasil> {
                                 ),
                                 child: Padding(
                                   padding: const EdgeInsets.all(10.0),
-                                  child: Center(child: Text("Steadiness", style: TextStyle(color: Colors.white),)),
+                                  child: Center(
+                                    child: Text(
+                                      "Steadiness",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
                                 ),
                               ),
-                              SizedBox(height: 10,),
+                              SizedBox(height: 10),
                               Container(
                                 decoration: BoxDecoration(
                                   color: Colors.orange.shade400,
@@ -281,14 +316,19 @@ class _HasilState extends State<Hasil> {
                                 ),
                                 child: Padding(
                                   padding: const EdgeInsets.all(10.0),
-                                  child: Center(child: Text("Compliance", style: TextStyle(color: Colors.white),)),
+                                  child: Center(
+                                    child: Text(
+                                      "Compliance",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
                                 ),
                               ),
                             ],
                           ),
                         ),
                       ],
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -340,83 +380,16 @@ class _HasilState extends State<Hasil> {
                     ),
                     const SizedBox(height: 20),
 
-                    if (highestType == 'D') ...[
-                      _buildDetailItem(
-                        title: "Gaya Bekerja",
-                        content: D_user_result['Gaya bekerja']!,
-                      ),
-                      _buildDetailItem(
-                        title: "Hal-hal yang Dianggap Penting",
-                        content:
-                            D_user_result['Hal-hal yang dianggap penting']!,
-                      ),
-                      _buildDetailItem(
-                        title: "Rekan Kerja yang Dibutuhkan",
-                        content: D_user_result['Rekan kerja yang dibutuhkan']!,
-                      ),
-                      _buildDetailItem(
-                        title: "Saran",
-                        content: D_user_result['Saran']!,
-                        isLast: true,
-                      ),
-                    ] else if (highestType == 'I') ...[
-                      _buildDetailItem(
-                        title: "Gaya Bekerja",
-                        content: I_user_result['Gaya bekerja']!,
-                      ),
-                      _buildDetailItem(
-                        title: "Hal-hal yang Dianggap Penting",
-                        content:
-                            I_user_result['Hal-hal yang dianggap penting']!,
-                      ),
-                      _buildDetailItem(
-                        title: "Rekan Kerja yang Dibutuhkan",
-                        content: I_user_result['Rekan kerja yang dibutuhkan']!,
-                      ),
-                      _buildDetailItem(
-                        title: "Saran",
-                        content: I_user_result['Saran']!,
-                        isLast: true,
-                      ),
-                    ] else if (highestType == 'S') ...[
-                      _buildDetailItem(
-                        title: "Gaya Bekerja",
-                        content: S_user_result['Gaya bekerja']!,
-                      ),
-                      _buildDetailItem(
-                        title: "Hal-hal yang Dianggap Penting",
-                        content:
-                            S_user_result['Hal-hal yang dianggap penting']!,
-                      ),
-                      _buildDetailItem(
-                        title: "Rekan Kerja yang Dibutuhkan",
-                        content: S_user_result['Rekan kerja yang dibutuhkan']!,
-                      ),
-                      _buildDetailItem(
-                        title: "Saran",
-                        content: S_user_result['Saran']!,
-                        isLast: true,
-                      ),
-                    ] else if (highestType == 'C') ...[
-                      _buildDetailItem(
-                        title: "Gaya Bekerja",
-                        content: C_user_result['Gaya bekerja']!,
-                      ),
-                      _buildDetailItem(
-                        title: "Hal-hal yang Dianggap Penting",
-                        content:
-                            C_user_result['Hal-hal yang dianggap penting']!,
-                      ),
-                      _buildDetailItem(
-                        title: "Rekan Kerja yang Dibutuhkan",
-                        content: C_user_result['Rekan kerja yang dibutuhkan']!,
-                      ),
-                      _buildDetailItem(
-                        title: "Saran",
-                        content: C_user_result['Saran']!,
-                        isLast: true,
-                      ),
-                    ],
+                    // Tampilkan loading atau konten
+                    if (isLoading)
+                      const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(20.0),
+                          child: CircularProgressIndicator(),
+                        ),
+                      )
+                    else
+                      _buildPersonalityDetails(),
                   ],
                 ),
               ),
@@ -429,35 +402,33 @@ class _HasilState extends State<Hasil> {
                   Expanded(
                     child: OutlinedButton.icon(
                       onPressed: () async {
-                        if (_jabatan == "Manager") {
+                        if (widget.jabatan == "Manager") {
                           Navigator.pushAndRemoveUntil(
                             context,
                             MaterialPageRoute(
-                              builder:
-                                  (context) => BottomNavigationManager(
-                                    username: widget.username,
-                                    nama: userData!["nama"],
-                                    umur: userData!["umur"],
-                                    email: userData!["email"],
-                                    jabatan: userData!["jabatan"],
-                                    bidang: userData!["bidang"],
-                                  ),
+                              builder: (context) => BottomNavigationManager(
+                                username: widget.username,
+                                nama: widget.userData["nama"],
+                                umur: widget.userData["umur"],
+                                email: widget.userData["email"],
+                                jabatan: widget.userData["jabatan"],
+                                bidang: widget.userData["bidang"],
+                              ),
                             ),
                             (route) => false,
                           );
-                        } else if (_jabatan == "Karyawan") {
+                        } else if (widget.jabatan == "Karyawan") {
                           Navigator.pushAndRemoveUntil(
                             context,
                             MaterialPageRoute(
-                              builder:
-                                  (context) => BottomNavigationUser(
-                                    username: widget.username,
-                                    nama: userData!["nama"],
-                                    umur: userData!["umur"],
-                                    email: userData!["email"],
-                                    jabatan: userData!["jabatan"],
-                                    bidang: userData!["bidang"],
-                                  ),
+                              builder: (context) => BottomNavigationUser(
+                                username: widget.username,
+                                nama: widget.userData["nama"],
+                                umur: widget.userData["umur"],
+                                email: widget.userData["email"],
+                                jabatan: widget.userData["jabatan"],
+                                bidang: widget.userData["bidang"],
+                              ),
                             ),
                             (route) => false,
                           );
@@ -480,7 +451,7 @@ class _HasilState extends State<Hasil> {
                       onPressed: () {
                         FirebaseEditData().updateTipe(
                           widget.username,
-                          _getTypeName(highestType),
+                          _getTypeName(widget.highestType),
                         );
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
@@ -488,35 +459,33 @@ class _HasilState extends State<Hasil> {
                             backgroundColor: Colors.green,
                           ),
                         );
-                        if (_jabatan == "Manager") {
+                        if (widget.jabatan == "Manager") {
                           Navigator.pushAndRemoveUntil(
                             context,
                             MaterialPageRoute(
-                              builder:
-                                  (context) => BottomNavigationManager(
-                                    username: widget.username,
-                                    nama: userData!["nama"],
-                                    umur: userData!["umur"],
-                                    email: userData!["email"],
-                                    jabatan: userData!["jabatan"],
-                                    bidang: userData!["bidang"],
-                                  ),
+                              builder: (context) => BottomNavigationManager(
+                                username: widget.username,
+                                nama: widget.userData["nama"],
+                                umur: widget.userData["umur"],
+                                email: widget.userData["email"],
+                                jabatan: widget.userData["jabatan"],
+                                bidang: widget.userData["bidang"],
+                              ),
                             ),
                             (context) => false,
                           );
-                        } else if (_jabatan == "Karyawan") {
+                        } else if (widget.jabatan == "Karyawan") {
                           Navigator.pushAndRemoveUntil(
                             context,
                             MaterialPageRoute(
-                              builder:
-                                  (context) => BottomNavigationUser(
-                                    username: widget.username,
-                                    nama: userData!["nama"],
-                                    umur: userData!["umur"],
-                                    email: userData!["email"],
-                                    jabatan: userData!["jabatan"],
-                                    bidang: userData!["bidang"],
-                                  ),
+                              builder: (context) => BottomNavigationUser(
+                                username: widget.username,
+                                nama: widget.userData["nama"],
+                                umur: widget.userData["umur"],
+                                email: widget.userData["email"],
+                                jabatan: widget.userData["jabatan"],
+                                bidang: widget.userData["bidang"],
+                              ),
                             ),
                             (context) => false,
                           );
@@ -544,29 +513,84 @@ class _HasilState extends State<Hasil> {
     );
   }
 
+  // Method terpisah untuk menampilkan detail kepribadian
+  Widget _buildPersonalityDetails() {
+    List<dynamic> currentData = [];
+    
+    // Pilih data berdasarkan tipe tertinggi
+    switch (widget.highestType) {
+      case 'D':
+        currentData = hasilD;
+        break;
+      case 'I':
+        currentData = hasilI;
+        break;
+      case 'S':
+        currentData = hasilS;
+        break;
+      case 'C':
+        currentData = hasilC;
+        break;
+    }
+
+    // Cek apakah data tersedia dan memiliki elemen
+    if (currentData.isEmpty) {
+      return Center(
+        child: Text(
+          'Data tidak tersedia',
+          style: TextStyle(color: Colors.grey.shade600),
+        ),
+      );
+    }
+
+    // PERBAIKAN BUG: Untuk tipe 'C', gunakan hasilC bukan hasilS
+    final data = currentData[0];
+    
+    return Column(
+      children: [
+        _buildDetailItem(
+          title: "Gaya Bekerja",
+          content: data['Gaya Bekerja'] ?? 'Data tidak tersedia',
+        ),
+        _buildDetailItem(
+          title: "Hal-hal yang Dianggap Penting",
+          content: data['Hal-hal yang dianggap penting'] ?? 'Data tidak tersedia',
+        ),
+        _buildDetailItem(
+          title: "Rekan Kerja yang Dibutuhkan",
+          content: data['Rekan kerja yang dibutuhkan'] ?? 'Data tidak tersedia',
+        ),
+        _buildDetailItem(
+          title: "Saran",
+          content: data['Saran'] ?? 'Data tidak tersedia',
+          isLast: true,
+        ),
+      ],
+    );
+  }
+
   Widget _buildDonutChart() {
     return SizedBox(
-      height: 200, 
-      width: 150,  
+      height: 200,
+      width: 150,
       child: PieChart(
         PieChartData(
           centerSpaceRadius: 20,
           sectionsSpace: 1,
-          sections:
-              widget.scores.entries.map((entry) {
-                final color = typeColors[entry.key] ?? Colors.blue;
-                return PieChartSectionData(
-                  value: entry.value.toDouble(),
-                  title: '${entry.value}',
-                  color: color,
-                  radius: 60,
-                  titleStyle: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                );
-              }).toList(),
+          sections: widget.scores.entries.map((entry) {
+            final color = typeColors[entry.key] ?? Colors.blue;
+            return PieChartSectionData(
+              value: entry.value.toDouble(),
+              title: '${entry.value}',
+              color: color,
+              radius: 60,
+              titleStyle: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            );
+          }).toList(),
         ),
       ),
     );

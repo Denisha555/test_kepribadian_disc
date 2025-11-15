@@ -50,14 +50,19 @@ class FirebaseMasukDaftar {
   }
 
   Future<String> checkJabatan(String username) async {
-    String jabatan = await FirebaseFirestore.instance
-        .collection('users')
-        .where("username", isEqualTo: username)
-        .get()
-        .then((querySnapshot) {
-          return querySnapshot.docs[0].get('jabatan');
-        });
-    return jabatan;
+    try {
+      print(username);
+      var query =
+          await FirebaseFirestore.instance
+              .collection('users')
+              .where("username", isEqualTo: username)
+              .get();
+
+      return query.docs.first.get('jabatan') ?? "";
+    } catch (e) {
+      print("checkJabatan ERROR: $e");
+      return "";
+    }
   }
 
   Future<Map<String, dynamic>?> getData(String username) async {

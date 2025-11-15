@@ -1,5 +1,6 @@
 import 'package:aplikasi_tes_kepribadian/bottom_navigation_manager.dart';
 import 'package:aplikasi_tes_kepribadian/bottom_navigation_user.dart';
+import 'package:aplikasi_tes_kepribadian/firebase/firebase_forward_chaining.dart';
 import 'package:aplikasi_tes_kepribadian/firebase/firebase_masuk_daftar.dart';
 import 'package:aplikasi_tes_kepribadian/hasil.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +22,7 @@ class _QuisState extends State<Quis> {
   Map<String, dynamic>? userData = {};
   String jabatan = '';
   bool isLoading = true;
+  List<String> fakta = [];
 
   @override
   void initState() {
@@ -53,7 +55,7 @@ class _QuisState extends State<Quis> {
     });
   }
 
-  void nextQuestion() {
+  void nextQuestion() async {
     if (selectedAnswerIndex == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -71,9 +73,7 @@ class _QuisState extends State<Quis> {
       return;
     }
 
-    // Simpan skor berdasarkan jawaban (D, I, S, C)
-    String personality = ['D', 'I', 'S', 'C'][selectedAnswerIndex!];
-    scores[personality] = scores[personality]! + 1;
+    fakta.add(questions[currentIndex][selectedAnswerIndex!]);
 
     if (currentIndex < questions.length - 1) {
       setState(() {
@@ -81,15 +81,177 @@ class _QuisState extends State<Quis> {
         selectedAnswerIndex = null; // Reset pilihan
       });
     } else {
-      // Tes selesai → pindah ke halaman hasil
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(
-          builder:
-              (context) => Hasil(scores: scores, username: widget.username),
-        ),
-        (route) => false,
+      // Tampilkan loading dialog
+      showDialog(
+        context: context,
+        barrierDismissible: false, // Tidak bisa ditutup dengan tap di luar
+        builder: (BuildContext context) {
+          return PopScope(
+            canPop: false, // Tidak bisa ditutup dengan back button
+            child: Dialog(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              child: Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Animated Loading Indicator
+                    SizedBox(
+                      width: 80,
+                      height: 80,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 5,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          Colors.blue.shade400,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    const Text(
+                      'Memproses Hasil...',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Mohon tunggu sebentar',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
       );
+
+      try {
+        // Proses data
+        int D = 0, I = 0, S = 0, C = 0;
+
+        await FirebaseForwardChaining().uploadriwayat(
+          userData!["username"],
+          userData!["nama"],
+          fakta,
+        );
+
+        var faktaUser = await FirebaseForwardChaining().getRiwayat(
+          userData!["username"],
+        );
+
+        var allFakta = await FirebaseForwardChaining().getAllCiri();
+
+        for (var fakta in allFakta) {
+          if (faktaUser.contains(fakta["keterangan"])) {
+            var tipe = fakta["label"];
+            if (tipe == "D") {
+              D++;
+              await FirebaseForwardChaining().updateNilai(
+                widget.username,
+                "D",
+                D,
+              );
+            }
+            if (tipe == "I") {
+              I++;
+              await FirebaseForwardChaining().updateNilai(
+                widget.username,
+                "I",
+                I,
+              );
+            }
+            if (tipe == "S") {
+              S++;
+              await FirebaseForwardChaining().updateNilai(
+                widget.username,
+                "S",
+                S,
+              );
+            }
+            if (tipe == "C") {
+              C++;
+              await FirebaseForwardChaining().updateNilai(
+                widget.username,
+                "C",
+                C,
+              );
+            }
+          }
+        }
+
+        String highestType = '';
+
+        if (D >= I && D >= S && D >= C) {
+          highestType = 'D';
+        } else if (I >= D && I >= S && I >= C) {
+          highestType = 'I';
+        } else if (S >= D && S >= I && S >= C) {
+          highestType = 'S';
+        } else if (C >= D && C >= I && C >= S) {
+          highestType = 'C';
+        }
+
+        scores['D'] = D;
+        scores['I'] = I;
+        scores['S'] = S;
+        scores['C'] = C;
+
+        await FirebaseForwardChaining().updateRiwayat(
+          widget.username,
+          highestType,
+        );
+
+        // Tutup loading dialog
+        if (mounted) {
+          Navigator.of(context).pop();
+        }
+
+        // Navigasi ke halaman hasil
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+            builder:
+                (context) => Hasil(
+                  scores: scores,
+                  highestType: highestType,
+                  username: widget.username,
+                  jabatan: jabatan,
+                  userData: userData!,
+                ),
+          ),
+          (route) => false,
+        );
+      } catch (e) {
+        // Tutup loading dialog jika ada error
+        if (mounted) {
+          Navigator.of(context).pop();
+        }
+
+        // Tampilkan error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              "Terjadi kesalahan: ${e.toString()}",
+              style: const TextStyle(color: Colors.white),
+            ),
+            backgroundColor: Colors.red.shade400,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        );
+      }
     }
   }
 
@@ -100,6 +262,7 @@ class _QuisState extends State<Quis> {
         selectedAnswerIndex = null;
       });
     }
+    fakta.removeLast();
   }
 
   @override
