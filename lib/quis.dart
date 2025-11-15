@@ -192,46 +192,96 @@ class _QuisState extends State<Quis> {
 
         String highestType = '';
 
-        if (D >= I && D >= S && D >= C) {
-          highestType = 'D';
-        } else if (I >= D && I >= S && I >= C) {
-          highestType = 'I';
-        } else if (S >= D && S >= I && S >= C) {
-          highestType = 'S';
-        } else if (C >= D && C >= I && C >= S) {
-          highestType = 'C';
+        var rule = await FirebaseForwardChaining().getRule();
+
+        var rule1 = rule[0]["kondisi"];
+        var rule2 = rule[1]["kondisi"];
+        var rule3 = rule[2]["kondisi"];
+        var rule4 = rule[3]["kondisi"];
+
+        var result1 = rule[0]["hasil"];
+        var result2 = rule[1]["hasil"];
+        var result3 = rule[2]["hasil"];
+        var result4 = rule[3]["hasil"];
+
+        bool evalCondition(String condition, int D, int I, int S, int C) {
+          condition = condition
+              .replaceAll("D", D.toString())
+              .replaceAll("I", I.toString())
+              .replaceAll("S", S.toString())
+              .replaceAll("C", C.toString());
+
+          List<String> parts = condition.split("&&");
+
+          for (var part in parts) {
+            part = part.trim();
+            if (part.contains(">=")) {
+              var sides = part.split(">=");
+              int left = int.parse(sides[0].trim());
+              int right = int.parse(sides[1].trim());
+              if (!(left >= right)) return false;
+            }
+          }
+          return true;
         }
 
-        scores['D'] = D;
-        scores['I'] = I;
-        scores['S'] = S;
-        scores['C'] = C;
-
-        await FirebaseForwardChaining().updateRiwayat(
-          widget.username,
-          highestType,
-        );
-
-        // Tutup loading dialog
-        if (mounted) {
-          Navigator.of(context).pop();
+        if (evalCondition(rule1, D, I, S, C)) {
+          highestType = result1;
+          await FirebaseForwardChaining().updateRiwayat(
+            widget.username,
+            highestType,
+          );
         }
 
-        // Navigasi ke halaman hasil
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-            builder:
-                (context) => Hasil(
-                  scores: scores,
-                  highestType: highestType,
-                  username: widget.username,
-                  jabatan: jabatan,
-                  userData: userData!,
-                ),
-          ),
-          (route) => false,
-        );
+        if (evalCondition(rule2, D, I, S, C)) {
+          highestType = result2;
+          await FirebaseForwardChaining().updateRiwayat(
+            widget.username,
+            highestType,
+          );
+
+          if (evalCondition(rule3, D, I, S, C)) {
+            highestType = result3;
+            await FirebaseForwardChaining().updateRiwayat(
+              widget.username,
+              highestType,
+            );
+          }
+
+          if (evalCondition(rule4, D, I, S, C)) {
+            highestType = result4;
+            await FirebaseForwardChaining().updateRiwayat(
+              widget.username,
+              highestType,
+            );
+          }
+
+          scores['D'] = D;
+          scores['I'] = I;
+          scores['S'] = S;
+          scores['C'] = C;
+
+          // Tutup loading dialog
+          if (mounted) {
+            Navigator.of(context).pop();
+          }
+
+          // Navigasi ke halaman hasil
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+              builder:
+                  (context) => Hasil(
+                    scores: scores,
+                    highestType: highestType,
+                    username: widget.username,
+                    jabatan: jabatan,
+                    userData: userData!,
+                  ),
+            ),
+            (route) => false,
+          );
+        }
       } catch (e) {
         // Tutup loading dialog jika ada error
         if (mounted) {

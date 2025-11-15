@@ -50,23 +50,23 @@ class FirebaseForwardChaining {
     final firestore = FirebaseFirestore.instance;
 
     await firestore.collection('rule').doc('R1').set({
-      'kondisi': 'D>I AND D>S AND D>C',
-      'hasil': 'K1',
+      'kondisi': 'D>=I && D>=S && D>=C',
+      'hasil': 'D',
     });
 
     await firestore.collection('rule').doc('R2').set({
-      'kondisi': 'I>D AND I>S AND I<C',
-      'hasil': 'K2',
+      'kondisi': 'I>=D && I>=S && I>=C',
+      'hasil': 'I',
     });
 
     await firestore.collection('rule').doc('R3').set({
-      'kondisi': 'S>D AND S>I AND S>C',
-      'hasil': 'K3',
+      'kondisi': 'S>=D && S>=I && S>=C',
+      'hasil': 'S',
     });
 
     await firestore.collection('rule').doc('R4').set({
-      'kondisi': 'C>D AND C>I AND C>S',
-      'hasil': 'K4',
+      'kondisi': 'C>=D && C>=I && C>=S',
+      'hasil': 'C',
     });
   }
 
@@ -234,6 +234,14 @@ class FirebaseForwardChaining {
     final firestore = FirebaseFirestore.instance;
 
     var snapshot = await firestore.collection('hasil_manager').where("kepribadian", isEqualTo: type).get();
+
+    return snapshot.docs.map((doc) => doc.data()).toList();
+  }
+
+  Future<List <Map<String, dynamic>>> getRule() async {
+    final firestore = FirebaseFirestore.instance;
+
+    var snapshot = await firestore.collection('rule').get();
 
     return snapshot.docs.map((doc) => doc.data()).toList();
   }
