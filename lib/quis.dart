@@ -239,49 +239,49 @@ class _QuisState extends State<Quis> {
             widget.username,
             highestType,
           );
+        }
 
-          if (evalCondition(rule3, D, I, S, C)) {
-            highestType = result3;
-            await FirebaseForwardChaining().updateRiwayat(
-              widget.username,
-              highestType,
-            );
-          }
-
-          if (evalCondition(rule4, D, I, S, C)) {
-            highestType = result4;
-            await FirebaseForwardChaining().updateRiwayat(
-              widget.username,
-              highestType,
-            );
-          }
-
-          scores['D'] = D;
-          scores['I'] = I;
-          scores['S'] = S;
-          scores['C'] = C;
-
-          // Tutup loading dialog
-          if (mounted) {
-            Navigator.of(context).pop();
-          }
-
-          // Navigasi ke halaman hasil
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(
-              builder:
-                  (context) => Hasil(
-                    scores: scores,
-                    highestType: highestType,
-                    username: widget.username,
-                    jabatan: jabatan,
-                    userData: userData!,
-                  ),
-            ),
-            (route) => false,
+        if (evalCondition(rule3, D, I, S, C)) {
+          highestType = result3;
+          await FirebaseForwardChaining().updateRiwayat(
+            widget.username,
+            highestType,
           );
         }
+
+        if (evalCondition(rule4, D, I, S, C)) {
+          highestType = result4;
+          await FirebaseForwardChaining().updateRiwayat(
+            widget.username,
+            highestType,
+          );
+        }
+
+        scores['D'] = D;
+        scores['I'] = I;
+        scores['S'] = S;
+        scores['C'] = C;
+
+        // Tutup loading dialog
+        if (mounted) {
+          Navigator.of(context).pop();
+        }
+
+        // Navigasi ke halaman hasil
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+            builder:
+                (context) => Hasil(
+                  scores: scores,
+                  highestType: highestType,
+                  username: widget.username,
+                  jabatan: jabatan,
+                  userData: userData!,
+                ),
+          ),
+          (route) => false,
+        );
       } catch (e) {
         // Tutup loading dialog jika ada error
         if (mounted) {

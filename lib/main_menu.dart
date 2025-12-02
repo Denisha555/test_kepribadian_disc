@@ -16,7 +16,6 @@ class _MainMenuState extends State<MainMenu> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
-
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.only(left: 20, right: 20, top: 50, bottom: 30),
@@ -96,21 +95,10 @@ class _MainMenuState extends State<MainMenu> {
                         ),
                       ),
                       const SizedBox(height: 12),
-                      _buildDiscType(
-                        'D',
-                        'Dominance',
-                      ),
-                      _buildDiscType(
-                        'I',
-                        'Influence',
-                      ),
-                      _buildDiscType(
-                        'S', 
-                        'Steadiness'),
-                      _buildDiscType(
-                        'C',
-                        'Conscientiousness',
-                      ),
+                      _buildDiscType('D', 'Dominance'),
+                      _buildDiscType('I', 'Influence'),
+                      _buildDiscType('S', 'Steadiness'),
+                      _buildDiscType('C', 'Compliance'),
                       const SizedBox(height: 12),
                       const Text(
                         'Pahami gaya komunikasi dan preferensi kerjamu untuk meningkatkan kolaborasi dan efektivitas!',
@@ -125,31 +113,64 @@ class _MainMenuState extends State<MainMenu> {
                   ),
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 32),
 
-              // Quick Stats
+              // Test Instructions Section
               Row(
                 children: [
-                  Expanded(
-                    child: _buildStatCard(
-                      Icons.quiz_outlined,
-                      '15',
-                      'Questions',
-                      Colors.orange,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _buildStatCard(
-                      Icons.timer_outlined,
-                      '5-10',
-                      'Minutes',
-                      Colors.green,
+                  Icon(Icons.psychology_rounded, color: Colors.blue.shade600, size: 24),
+                  const SizedBox(width: 8),
+                  const Text(
+                    "Petunjuk Pengisian Test",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
                     ),
                   ),
                 ],
               ),
+              const SizedBox(height: 16),
+
+              // Instruction Items
+              _buildInstructionItem(
+                number: "1",
+                text: "Terdiri dari 15 pertanyaan",
+                icon: Icons.quiz_outlined,
+                color: Colors.purple,
+              ),
+              const SizedBox(height: 12),
+              
+              _buildInstructionItem(
+                number: "2",
+                text: "Pilih jawaban yang paling sesuai dengan diri Anda",
+                icon: Icons.touch_app_outlined,
+                color: Colors.blue,
+              ),
+              const SizedBox(height: 12),
+              
+              _buildInstructionItem(
+                number: "3",
+                text: "Tidak ada jawaban benar atau salah. Jawablah dengan jujur",
+                icon: Icons.favorite_outline,
+                color: Colors.pink,
+              ),
+              const SizedBox(height: 12),
+              
+              _buildInstructionItem(
+                number: "4",
+                text: "Tidak ada tipe kepribadian yang lebih baik atau lebih buruk. Semua tipe memiliki kelebihan unik",
+                icon: Icons.star_outline,
+                color: Colors.orange,
+              ),
               const SizedBox(height: 24),
+
+              _buildInstructionItem(
+                number: "5",
+                text: "Anda akan menerima ringkasan tipe dan deskripsi setelah tes selesai.",
+                icon: Icons.check_circle_outline,
+                color: Colors.green,
+              ),
 
               // Start Test Button
               SizedBox(
@@ -157,7 +178,12 @@ class _MainMenuState extends State<MainMenu> {
                 height: 56,
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => Quis(username: widget.username,)));
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Quis(username: widget.username),
+                      ),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue.shade600,
@@ -165,15 +191,27 @@ class _MainMenuState extends State<MainMenu> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    elevation: 3,
+                    elevation: 4,
+                    shadowColor: Colors.blue.shade300,
                   ),
-                  child: Text(
-                    'Start Test',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Text(
+                        'Mulai Test',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      
+                    ],
                   ),
                 ),
               ),
               const SizedBox(height: 16),
+
+              Text("Disclaimer: Hasil tes ini dapat berubah sesuai kondisi Anda. Tidak ada tipe yang lebih baik atau lebih buruk; hasil hanya menunjukkan kecenderungan perilaku berdasarkan pilihan Anda.", textAlign: TextAlign.justify, style: TextStyle(fontSize: 12, color: Colors.grey.shade600),),
             ],
           ),
         ),
@@ -220,40 +258,69 @@ class _MainMenuState extends State<MainMenu> {
     );
   }
 
-  Widget _buildStatCard(
-    IconData icon,
-    String value,
-    String label,
-    Color color,
-  ) {
+  Widget _buildInstructionItem({
+    required String number,
+    required String text,
+    required IconData icon,
+    required MaterialColor color,
+  }) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade200),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.shade200,
+            color: Colors.grey.shade100,
             blurRadius: 10,
-            offset: const Offset(0, 2),
+            offset: const Offset(0, 4),
           ),
         ],
       ),
-      child: Column(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: color, size: 32),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: color.shade100,
+              shape: BoxShape.circle,
+            ),
+            child: Center(
+              child: Icon(
+                icon,
+                color: color.shade700,
+                size: 20,
+              ),
             ),
           ),
-          Text(
-            label,
-            style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Langkah $number",
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: color.shade700,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  text,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey.shade700,
+                    height: 1.5,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
